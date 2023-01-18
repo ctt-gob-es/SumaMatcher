@@ -1,0 +1,96 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory app:title="@string/camera_header">
+        <ListPreference
+            app:defaultValue="0"
+            app:entries="@array/function_mode_entries"
+            app:entryValues="@array/function_mode_values"
+            app:key="function-mode"
+            app:title="@string/function_mode_title"
+            app:useSimpleSummaryProvider="true" />
+        <ListPreference
+            app:defaultValue="720x720"
+            app:entries="@array/resolutions_entries"
+            app:entryValues="@array/resolutions_values"
+            app:key="preview-size"
+            app:title="@string/previewsize_title"
+            app:useSimpleSummaryProvider="true" />
+        <ListPreference
+            app:defaultValue="1"
+            app:entries="@array/zoom_entries"
+            app:entryValues="@array/zoom_values"
+            app:key="zoom"
+            app:title="@string/zoom_title"
+            app:useSimpleSummaryProvider="true" />
+        <ListPreference
+            app:defaultValue="true"
+            app:entries="@array/text_to_speech_entries"
+            app:entryValues="@array/text_to_speech_values"
+            app:key="text_to_speech"
+            app:title="@string/text_to_speech_title"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/alpr_header">
+
+
+        <ListPreference
+            app:defaultValue="es"
+            app:entries="@array/country_entries"
+            app:entryValues="@array/country_values"
+            app:key="alpr-country"
+            app:title="@string/country_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="4"
+            app:entries="@array/topresults_entries"
+            app:entryValues="@array/topresults_values"
+            app:key="alpr-top-results"
+            app:title="@string/topresults_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="85"
+            app:entries="@array/confidence_entries"
+            app:entryValues="@array/confidence_values"
+            app:key="alpr-min-confidence"
+            app:title="@string/minconfidence_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="30000"
+            app:entries="@array/time_skip_entries"
+            app:entryValues="@array/time_skip_values"
+            app:key="time-skip-same-license"
+            app:title="@string/timeskip_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="4000"
+            app:entries="@array/time_wait_entries"
+            app:entryValues="@array/time_wait_values"
+            app:key="time-wait-next-license"
+            app:title="@string/timewait_title"
+            app:useSimpleSummaryProvider="true" />
+
+
+    </PreferenceCategory>
+    <PreferenceCategory app:title="@string/debug_header">
+        <ListPreference
+            app:defaultValue="false"
+            app:entries="@array/debug_mode_entries"
+            app:entryValues="@array/debug_mode_values"
+            app:key="debug-mode"
+            app:title="@string/debug_title"
+            app:useSimpleSummaryProvider="true" />
+        <ListPreference
+            app:defaultValue="rgb"
+            app:entries="@array/color_mode_entries"
+            app:entryValues="@array/color_mode_values"
+            app:key="color-mode"
+            app:title="@string/colormode_title"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+</PreferenceScreen>

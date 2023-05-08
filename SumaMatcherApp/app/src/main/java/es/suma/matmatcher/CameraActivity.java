@@ -27,11 +27,11 @@ package es.suma.matmatcher;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
@@ -70,6 +70,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.camera2.interop.Camera2CameraInfo;
 import androidx.camera.core.CameraControl;
@@ -116,8 +117,9 @@ public class CameraActivity extends AppCompatActivity
         CompoundButton.OnCheckedChangeListener,
         View.OnClickListener {
     private static final Logger LOGGER = new Logger();
-    private static final int PERMISSIONS_REQUEST = 1;
+    private static final int PERMISSIONS_REQUEST_CAMARA = 1;
     private static final String PERMISSION_CAMERA = Manifest.permission.CAMERA;
+    private static final int K_POSICION_PERMISO_CAMARA = 0;
     private static final int FUNCTION_MODE_MANUAL = 0;
     private static final int FUNCTION_MODE_AUTO = 1;
     private static final boolean SAVE_PREVIEW_BITMAP = false; // VERY SLOWLY. ONLY FOR TESTING
@@ -163,13 +165,14 @@ public class CameraActivity extends AppCompatActivity
 
     private long mLastAnalysisResultTime = 0;
     Size m_targetResolution = null;
-
+    private boolean primer_create = true;
 
     private final ActivityResultLauncher<Intent> m_configResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 finish();
                 overridePendingTransition(0, 0);
+                getIntent().putExtra("comienzo_applicacion",false);
                 startActivity(getIntent());
             });
 
@@ -184,6 +187,8 @@ public class CameraActivity extends AppCompatActivity
     private Matrix cropToFrameTransform;
     private int m_displayRotation;
     private CameraControl m_camControl;
+    private static final String K_MODO_COLOR_RGB = "rgb";
+
 
 
     @Override
@@ -192,7 +197,7 @@ public class CameraActivity extends AppCompatActivity
         appCtx = getApplicationContext();
         m_config = AlprConfig.create(appCtx);
         m_functionMode = m_config.getM_functionMode();
-        m_rgbMode =  m_config.getM_colorMode().equalsIgnoreCase("rgb");
+        m_rgbMode =  m_config.getM_colorMode().equalsIgnoreCase(K_MODO_COLOR_RGB);
         super.onCreate(null);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -288,15 +293,20 @@ public class CameraActivity extends AppCompatActivity
         Bundle extras = getIntent().getExtras();
         m_callFromApp = false;
         if (extras != null) {
-            m_callFromApp = true;
-            m_functionMode = extras.getInt("functionMode");
-            if (m_functionMode != FUNCTION_MODE_MANUAL && m_functionMode != FUNCTION_MODE_AUTO) {
-                m_functionMode = FUNCTION_MODE_MANUAL;
-                Toast.makeText(
-                        CameraActivity.this,
-                        getResources().getString(R.string.message_error_nomode_oncall),
-                        Toast.LENGTH_LONG)
-                        .show();
+            if (extras.containsKey("functionMode")) {
+                m_callFromApp = true;
+                m_functionMode = extras.getInt("functionMode");
+                if (m_functionMode != FUNCTION_MODE_MANUAL && m_functionMode != FUNCTION_MODE_AUTO) {
+                    m_functionMode = FUNCTION_MODE_MANUAL;
+                    Toast.makeText(
+                                    CameraActivity.this,
+                                    getResources().getString(R.string.message_error_nomode_oncall),
+                                    Toast.LENGTH_LONG)
+                            .show();
+                }
+            }
+            if (extras.containsKey("comienzo_applicacion")) {
+                primer_create = extras.getBoolean("comienzo_applicacion");
             }
         }
 
@@ -313,7 +323,9 @@ public class CameraActivity extends AppCompatActivity
         if (hasPermission()) {
             startCamera();
         } else {
-            requestPermission();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{PERMISSION_CAMERA}, PERMISSIONS_REQUEST_CAMARA);
+            }
         }
 
 
@@ -330,8 +342,9 @@ public class CameraActivity extends AppCompatActivity
     public synchronized void onResume() {
         LOGGER.d("onResume " + this);
         super.onResume();
-
-
+        if (hasPermission() && !cameraRunning) {
+            startCamera();
+        }
     }
 
     @Override
@@ -359,20 +372,32 @@ public class CameraActivity extends AppCompatActivity
     public void onRequestPermissionsResult(
             final int requestCode, @NonNull final String[] permissions, @NonNull final int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSIONS_REQUEST) {
-            if (!allPermissionsGranted(grantResults)) {
-                requestPermission();
+        if (requestCode == PERMISSIONS_REQUEST_CAMARA) {
+            if (grantResults.length > 0 &&
+                    grantResults[K_POSICION_PERMISO_CAMARA] == PackageManager.PERMISSION_DENIED) {
+                if (shouldShowRequestPermissionRationale(PERMISSION_CAMERA)) {
+                    Toast.makeText(
+                                    CameraActivity.this,
+                                    getResources().getString(R.string.message_camera_permission),
+                                    Toast.LENGTH_LONG)
+                            .show();
+                    requestPermissions(new String[]{PERMISSION_CAMERA}, PERMISSIONS_REQUEST_CAMARA);
+                } else {
+                    if (primer_create) {
+                        new AlertDialog.Builder(this)
+                                .setTitle(getString(R.string.tit_dialogo_permisos_no_concedidos))
+                                .setMessage(getString(R.string.msg_dialogo_permisos_no_concedidos))
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        //Dialogo solo informativo. No realiza ninguna acción.
+                                    }
+                                })
+                                .setIcon(R.drawable.ic_launcher_foreground)
+                                .show();
+                    }
+                }
             }
         }
-    }
-
-    private static boolean allPermissionsGranted(final int[] grantResults) {
-        for (int result : grantResults) {
-            if (result != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
-        return true;
     }
 
     private boolean hasPermission() {
@@ -380,19 +405,6 @@ public class CameraActivity extends AppCompatActivity
             return checkSelfPermission(PERMISSION_CAMERA) == PackageManager.PERMISSION_GRANTED;
         } else {
             return true;
-        }
-    }
-
-    private void requestPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (shouldShowRequestPermissionRationale(PERMISSION_CAMERA)) {
-                Toast.makeText(
-                        CameraActivity.this,
-                        getResources().getString(R.string.message_camera_permission),
-                        Toast.LENGTH_LONG)
-                        .show();
-            }
-            requestPermissions(new String[]{PERMISSION_CAMERA}, PERMISSIONS_REQUEST);
         }
     }
 
@@ -850,8 +862,15 @@ public class CameraActivity extends AppCompatActivity
                 notifyPlate(bestDetection.getmPlate(), "");
             }
 
-            AlprStore.getInstance(appCtx).insertDetection(bestDetection);
-            m_lastPlate = bestDetection.getmPlate();
+            //Si las coordenadas son negativas o la anchura de la imagen es menor la coordenada
+            //mX1, no guardamos la deteccion en la base de datos.
+            if (bestDetection.getmX0() >= 0 && bestDetection.getmX1() >= 0 &&
+                    bestDetection.getmY0() >= 0 && bestDetection.getmY1() >= 0 &&
+                    bestDetection.getmImage().getWidth() >= bestDetection.getmX1() ) {
+                    AlprStore.getInstance(appCtx).insertDetection(bestDetection);
+                    m_lastPlate = bestDetection.getmPlate();
+            }
+
             m_lastTimestamp = bestDetection.getTimestamp();
 
             if (detections != null && detections.size() > option) {
@@ -917,6 +936,7 @@ public class CameraActivity extends AppCompatActivity
         Intent intent = new Intent(this, SettingsActivity.class);
         intent.putExtra("test", false);
         intent.putExtra("previewSizes", m_supportedSizes);
+        intent.putExtra("comienzo_applicacion",false);
 
         onStop();
         m_configResultLauncher.launch(intent);

@@ -106,7 +106,16 @@ public class HistoryActivity extends AppCompatActivity {
             while (resultTable.getChildCount() > 1)
                 resultTable.removeView(resultTable.getChildAt(resultTable.getChildCount() - 1));
             for (int i=0; i<detections.size(); i++){
-                addResult(detections.get(i));
+                //Si las coordenadas son negativas o la anchura de la imagen es menor la coordenada
+                //mX1, borramos esa matrícula del historial.
+                if (detections.get(i).getmX0() < 0 || detections.get(i).getmX1() < 0 ||
+                        detections.get(i).getmY0() < 0 || detections.get(i).getmY1() <0
+                        || detections.get(i).getmImage().getWidth() < detections.get(i).getmX1() ) {
+                    AlprStore.getInstance(appCtx).deleteDetection(detections.get(i));
+                } else {
+                    addResult(detections.get(i));
+                }
+
             }
             spinner.setVisibility(View.INVISIBLE);
             if (detections.size()<=0){

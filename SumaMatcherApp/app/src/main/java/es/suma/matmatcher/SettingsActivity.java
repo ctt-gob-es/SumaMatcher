@@ -19,17 +19,25 @@ package es.suma.matmatcher;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.ListPreference;
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
+
 
 public class SettingsActivity extends AppCompatActivity {
 
+    private static final String K_CLAVE_MODO_COLOR = "color-mode";
+    private static final String K_CLAVE_DEBUG_MODE = "debug-mode";
+    private static final String K_CLAVE_OPCIONES_DESARROLLO = "habilitar-opciones-desarrollo";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,9 +64,9 @@ public class SettingsActivity extends AppCompatActivity {
 
 
 
-    public static class SettingsFragment extends PreferenceFragmentCompat {
+    public static class SettingsFragment extends PreferenceFragmentCompat implements PreferenceManager.OnDisplayPreferenceDialogListener {
 
-
+        private boolean esPrimeraSelecDesarrollo;
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -74,6 +82,72 @@ public class SettingsActivity extends AppCompatActivity {
 
             }
 
+            esPrimeraSelecDesarrollo = true;
+
+
+            if (getPreferenceScreen().findPreference(K_CLAVE_OPCIONES_DESARROLLO) != null) {
+                if (getPreferenceScreen().findPreference(K_CLAVE_OPCIONES_DESARROLLO).getSharedPreferences().
+                        getBoolean(K_CLAVE_OPCIONES_DESARROLLO,false)) {
+                    cambiosHabilitadoOpcionesDesarrollo();
+                }else {
+                    cambiosDeshabilitadoOpcionesDesarrollo();
+                }
+            }
+
+        }
+
+
+        @Override
+        public boolean onPreferenceTreeClick(Preference preference) {
+            String key = preference.getKey();
+            switch (key) {
+                case K_CLAVE_OPCIONES_DESARROLLO:
+                    if (preference.getSharedPreferences().
+                    getBoolean(K_CLAVE_OPCIONES_DESARROLLO,false) == true) {
+
+                        if (esPrimeraSelecDesarrollo == true) {
+                            if (getContext() != null) {
+                                new AlertDialog.Builder(getContext())
+                                        .setTitle(getString(R.string.tit_dialogo_preferencias_opciones_desarrollo))
+                                        .setMessage(getString(R.string.msg_dialogo_preferencias_opciones_desarrollo))
+                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                //Dialogo solo informativo. No realiza ninguna acción.
+                                            }
+                                        })
+                                        .setIcon(R.drawable.ic_launcher_foreground)
+                                        .show();
+                            }
+                            esPrimeraSelecDesarrollo = false;
+                        }
+                        cambiosHabilitadoOpcionesDesarrollo();
+                    }else {
+                        cambiosDeshabilitadoOpcionesDesarrollo();
+                    }
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private void cambiosHabilitadoOpcionesDesarrollo() {
+
+            if (getPreferenceScreen().findPreference(K_CLAVE_DEBUG_MODE) != null) {
+                getPreferenceScreen().findPreference(K_CLAVE_DEBUG_MODE).setEnabled(true);
+            }
+            if (getPreferenceScreen().findPreference(K_CLAVE_MODO_COLOR) != null) {
+                getPreferenceScreen().findPreference(K_CLAVE_MODO_COLOR).setEnabled(true);
+            }
+        }
+
+        private void cambiosDeshabilitadoOpcionesDesarrollo() {
+
+            if (getPreferenceScreen().findPreference(K_CLAVE_DEBUG_MODE) != null) {
+                getPreferenceScreen().findPreference(K_CLAVE_DEBUG_MODE).setEnabled(false);
+            }
+            if (getPreferenceScreen().findPreference(K_CLAVE_MODO_COLOR) != null) {
+                getPreferenceScreen().findPreference(K_CLAVE_MODO_COLOR).setEnabled(false);
+            }
         }
     }
 

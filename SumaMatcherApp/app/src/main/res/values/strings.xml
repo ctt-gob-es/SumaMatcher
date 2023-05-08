@@ -37,7 +37,7 @@
     <string name="message_deleteinfoplates">Se borrará la información registrada. Está acción no se puede deshacer ¿Continuamos con el borrado? </string>
     <string name="message_infoplates"> No hay información almacenada. Puede cargar un fichero con matrículas (hotlist) desde el menú superior </string>
     <string name="message_history"> No hay historial. Aquí verá el resultado de las detecciones de matrículas realizadas. </string>
-    <string name="message_camera_permission">Para ejecutar la app es necesario usar la camara</string>
+    <string name="message_camera_permission">Si no se dan permisos, no se podrá captar matrículas</string>
     <string name="lblDate">Fecha:</string>
     <string name="lblConfidence">Confianza:</string>
     <string name="message_warning_onlyvertical">Aviso. Está versión solo soporta la camara en posición vertical</string>
@@ -64,4 +64,9 @@
     <string name="button_label_accept">Aceptar</string>
     <string name="message_error_expires">Debe indicar una fecha valida en formato dd/mm/aaaa</string>
     <string name="button_label_delete">Borrar</string>
+    <string name="tit_dialogo_preferencias_opciones_desarrollo">Habilitando Opciones de Desarrollo</string>
+    <string name="msg_dialogo_preferencias_opciones_desarrollo">Estas opciones pueden afectar al buen funcionamiento de la aplicación. Se deben cambiar bajo la propia responsabilidad del usuario.</string>
+    <string name="tit_dialogo_permisos_no_concedidos">No se puede utilizar la camara</string>
+    <string name="msg_dialogo_permisos_no_concedidos">No tienes los permisos para utilizar la camara, por lo tanto la opción de captar matrítulas no funcionará.</string>
+    <string name="tit_preferencias_opciones_desarrollo">Opciones de Desarrollo</string>
 </resources>

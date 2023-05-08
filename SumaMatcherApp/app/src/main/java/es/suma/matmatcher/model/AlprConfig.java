@@ -92,7 +92,7 @@ public class AlprConfig {
         m_textToSpeech = Boolean.parseBoolean(w_textToSpeech);
         String w_debugMode =  w_prefs.getString("debug-mode", "false");
         m_debugMode= Boolean.parseBoolean(w_debugMode);
-        m_colorMode =  w_prefs.getString("color-mode", "rgb");
+        m_colorMode =  w_prefs.getString("color-mode", "yuv");
         String w_zoom =  w_prefs.getString("zoom", "1");
         m_zoom = Integer.parseInt(w_zoom);
 

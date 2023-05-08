@@ -132,6 +132,12 @@ public class AlprStore {
         }
     }
 
+    public int deleteDetection(AlprDetection record) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String selection = DetectionEntry.COLUMN_ID + " = " + record.getmId();
+        String[] selectionArgs = {};
+        return db.delete(DetectionEntry.TABLE_NAME, selection, selectionArgs);
+    }
 
     public long insertDetection(AlprDetection record) {
 
@@ -158,11 +164,6 @@ public class AlprStore {
         return newRowId;
     }
 
-    public int deleteDetection(AlprDetection record) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        String selection = DetectionEntry.COLUMN_ID + " = ?";
-        return db.delete(DetectionEntry.TABLE_NAME, selection, selectionArgs);
-    }
 
     public int deleteAllDetections() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();

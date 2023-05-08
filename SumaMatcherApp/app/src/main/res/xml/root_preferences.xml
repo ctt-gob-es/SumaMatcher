@@ -78,19 +78,27 @@
 
     </PreferenceCategory>
     <PreferenceCategory app:title="@string/debug_header">
+        <CheckBoxPreference
+            android:title="@string/tit_preferencias_opciones_desarrollo"
+            android:defaultValue="false"
+            android:summary="Si es marcado se habilitan las opciones de desarrollo"
+            android:key="habilitar-opciones-desarrollo"
+            app:useSimpleSummaryProvider="true" />
         <ListPreference
             app:defaultValue="false"
             app:entries="@array/debug_mode_entries"
             app:entryValues="@array/debug_mode_values"
             app:key="debug-mode"
             app:title="@string/debug_title"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="true"
+            android:enabled="false" />
         <ListPreference
-            app:defaultValue="rgb"
+            app:defaultValue="yuv"
             app:entries="@array/color_mode_entries"
             app:entryValues="@array/color_mode_values"
             app:key="color-mode"
             app:title="@string/colormode_title"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="true"
+            android:enabled="false" />
     </PreferenceCategory>
 </PreferenceScreen>

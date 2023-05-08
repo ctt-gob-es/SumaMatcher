@@ -161,6 +161,7 @@ public class AlprStore {
     public int deleteDetection(AlprDetection record) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String selection = DetectionEntry.COLUMN_ID + " = ?";
+        String[] selectionArgs = {record.getmId()};
         return db.delete(DetectionEntry.TABLE_NAME, selection, selectionArgs);
     }
 
